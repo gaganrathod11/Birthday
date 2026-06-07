@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Vaishu! 💖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, orderBy, query, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMfZI3r14D90-dfjOmKA-QWXHImZtm9zY",
+            authDomain: "connecting-with-sim800l.firebaseapp.com",
+            databaseURL: "https://connecting-with-sim800l-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "connecting-with-sim800l",
+            storageBucket: "connecting-with-sim800l.firebasestorage.app",
+            messagingSenderId: "54868876465",
+            appId: "1:54868876465:web:cf38bf70f01d9134575690",
+            measurementId: "G-GQQHGCWZS2"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // Make db available globally
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.query = query;
+        window.orderBy = orderBy;
+        window.limit = limit;
+        window.onSnapshot = onSnapshot;
+    </script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            pink: '#ffb3c6',
+                            purple: '#c8b6ff',
+                            yellow: '#ffeba8',
+                            dark: '#2d3748',
+                            light: '#fdf2f8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        cursive: ['Dancing Script', 'cursive'],
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #fdf2f8;
+            background-image: radial-gradient(#ffb3c6 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow-x: hidden;
+        }
+
+        .page-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .page-section.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .sticker {
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
+            transition: transform 0.3s ease;
+        }
+        .sticker:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        #special-message-modal {
+            display: none;
+        }
+        #special-message-modal.show {
+            display: flex;
+        }
+        
+        /* Image popup lightbox */
+        #image-lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            cursor: pointer;
+            justify-content: center;
+            align-items: center;
+        }
+        #image-lightbox.show {
+            display: flex;
+        }
+        #lightbox-img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(255,255,255,0.3);
+            animation: zoomIn 0.3s ease-out;
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .memory-img {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .memory-img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        /* Message card animations */
+        .message-card {
+            transition: all 0.3s ease;
+        }
+        .message-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="text-brand-dark min-h-screen flex flex-col items-center justify-center relative">
+
+    <!-- Image Lightbox Popup -->
+    <div id="image-lightbox" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="Full size memory">
+        <button onclick="closeLightbox()" style="position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; background: none; border: none; cursor: pointer;">&times;</button>
+    </div>
+
+    <!-- Decorative Floating Elements -->
+    <div class="fixed top-10 left-10 text-4xl text-brand-pink animate-float opacity-70 z-0"><i class="fa-solid fa-heart"></i></div>
+    <div class="fixed bottom-20 right-10 text-5xl text-brand-purple animate-bounce-slow opacity-70 z-0"><i class="fa-solid fa-star"></i></div>
+    <div class="fixed top-1/4 right-20 text-3xl text-yellow-400 animate-wiggle opacity-70 z-0"><i class="fa-solid fa-crown"></i></div>
+    <div class="fixed bottom-1/3 left-1/4 text-4xl text-pink-400 animate-float opacity-70 z-0" style="animation-delay: 1s;"><i class="fa-solid fa-cake-candles"></i></div>
+
+    <!-- Navigation Dots -->
+    <div class="fixed right-4 top-1/2 transform -translate-y-1/2 z-50 flex flex-col gap-3 hidden md:flex">
+        <button onclick="navigateTo('welcome')" class="w-3 h-3 rounded-full bg-brand-pink nav-dot" id="dot-welcome"></button>
+        <button onclick="navigateTo('about')" class="w-3 h-3 rounded-full bg-gray-300 nav-dot" id="dot-about"></button>
+        <button onclick="navigateTo('questions')" class="w-3 h-3 rounded-full bg-gray-300 nav-dot" id="dot-questions"></button>
+        <button onclick="navigateTo('wishes')" class="w-3 h-3 rounded-full bg-gray-300 nav-dot" id="dot-wishes"></button>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="w-full max-w-4xl px-4 py-8 relative z-10">
+
+        <!-- SECTION 1: Welcome -->
+        <section id="welcome" class="page-section active flex-col items-center justify-center min-h-[80vh] text-center">
+            <div class="glass-card rounded-3xl p-8 md:p-16 w-full transform transition-all hover:scale-[1.02] duration-300">
+                <div class="inline-block mb-6 relative">
+                    <div class="w-40 h-40 md:w-48 md:h-48 rounded-full border-4 border-white shadow-xl bg-gradient-to-br from-brand-pink to-brand-purple flex items-center justify-center mx-auto">
+                        <span class="text-white text-6xl font-cursive">V</span>
+                    </div>
+                    <div class="absolute -bottom-4 -right-4 text-5xl sticker animate-wiggle">👑</div>
+                </div>
+                <h1 class="font-cursive text-5xl md:text-7xl text-brand-purple mb-4 drop-shadow-sm">
+                    Happy Birthday,
+                    <br>
+                    <span class="text-brand-pink">Vaishu!</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-600 mb-8 font-light max-w-lg mx-auto">
+                    To the most amazing, wonderful, and beautiful girl. May your day be as bright and sparkling as your smile! ✨
+                </p>
+                <button onclick="triggerConfetti(); navigateTo('about')" class="bg-brand-pink hover:bg-pink-400 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:-translate-y-1 hover:shadow-xl text-lg flex items-center gap-2 mx-auto">
+                    Let's Celebrate! <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 2: About / Information with CLICKABLE IMAGE -->
+        <section id="about" class="page-section flex-col items-center justify-center min-h-[80vh]">
+            <div class="glass-card rounded-3xl p-8 md:p-12 w-full">
+                <div class="flex justify-between items-center mb-8">
+                    <button onclick="navigateTo('welcome')" class="text-gray-400 hover:text-brand-pink transition"><i class="fa-solid fa-arrow-left text-xl"></i></button>
+                    <h2 class="font-cursive text-4xl md:text-5xl text-brand-purple text-center flex-grow">All About the Queen</h2>
+                    <div class="w-6"></div>
+                </div>
+
+                <div class="flex flex-col gap-8">
+                    <div class="bg-white/50 rounded-2xl p-6 md:p-8 border border-white shadow-sm hover:shadow-md transition">
+                        <div class="text-3xl text-brand-pink mb-4 sticker">❤️</div>
+                        <h3 class="font-bold text-2xl mb-3 text-gray-800">Why She's Amazing</h3>
+                        <p class="text-gray-700 italic leading-relaxed text-lg md:text-xl">"Our friendship is so important to me, but over time, my feelings have grown into something deeper. I wanted to be honest with you about it."</p>
+                    </div>
+
+                    <!-- CLICKABLE IMAGE - Opens in lightbox -->
+                    <div class="bg-white/50 rounded-2xl p-6 md:p-8 border border-white shadow-sm hover:shadow-md transition text-center">
+                        <div class="flex items-center justify-center gap-4 mb-6">
+                            <div class="text-4xl text-brand-purple sticker"><i class="fa-regular fa-image"></i></div>
+                            <h3 class="font-bold text-2xl text-gray-800">A Beautiful Memory ✨</h3>
+                        </div>
+                        
+                        <div class="flex justify-center">
+                            <img id="memory-photo" src="https://iili.io/Cq91Ya2.jpg" 
+                                 alt="Vaishu's beautiful memory" 
+                                 class="w-72 h-72 md:w-88 md:h-88 rounded-2xl object-cover shadow-xl border-4 border-white memory-img"
+                                 onclick="openLightbox(this.src)"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x400/c8b6ff/ffffff?text=Vaishu+Love';">
+                        </div>
+                        <p class="text-sm text-gray-500 mt-4 italic">💖 Click on the image to view full size 💖</p>
+                    </div>
+                </div>
+
+                <div class="mt-10 text-center">
+                    <button onclick="navigateTo('questions')" class="bg-brand-purple hover:bg-purple-400 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:-translate-y-1 hover:shadow-xl text-lg flex items-center gap-2 mx-auto">
+                        Share Your Feelings <i class="fa-solid fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Questions & Firebase Storage -->
+        <section id="questions" class="page-section flex-col items-center justify-center min-h-[80vh]">
+            <div class="glass-card rounded-3xl p-8 md:p-12 w-full">
+                <div class="flex justify-between items-center mb-8">
+                    <button onclick="navigateTo('about')" class="text-gray-400 hover:text-brand-purple transition"><i class="fa-solid fa-arrow-left text-xl"></i></button>
+                    <h2 class="font-cursive text-4xl md:text-5xl text-brand-pink text-center flex-grow">Share Your Heart 💕</h2>
+                    <div class="w-6"></div>
+                </div>
+
+                <!-- Question Form -->
+                <div class="bg-white/50 rounded-2xl p-6 mb-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">📝 Leave a Message for Vaishu</h3>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-semibold mb-2">What do you think about Vaishu?</label>
+                        <textarea id="thoughts-input" rows="3" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink outline-none transition" placeholder="She is amazing because..."></textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-semibold mb-2">Your birthday wish for Vaishu 🎂</label>
+                        <textarea id="wish-input" rows="3" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink outline-none transition" placeholder="I wish you..."></textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-semibold mb-2">Your Name (optional)</label>
+                        <input type="text" id="name-input" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:border-brand-pink focus:ring-2 focus:ring-brand-pink outline-none transition" placeholder="Anonymous or your name">
+                    </div>
+                    
+                    <button onclick="submitMessage()" class="bg-gradient-to-r from-brand-pink to-brand-purple hover:opacity-90 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:-translate-y-1 text-lg">
+                        <i class="fa-regular fa-paper-plane"></i> Send Your Wishes
+                    </button>
+                </div>
+
+                <!-- Display Messages from Firebase -->
+                <div class="bg-white/50 rounded-2xl p-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">💝 Messages from Friends 💝</h3>
+                    <div id="messages-container" class="space-y-3 max-h-96 overflow-y-auto">
+                        <div class="text-center text-gray-500 py-8">
+                            <i class="fa-solid fa-spinner fa-spin"></i> Loading messages...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button onclick="navigateTo('wishes')" class="bg-brand-pink hover:bg-pink-400 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:-translate-y-1 text-lg">
+                    Read Sweet Thoughts <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Wishes & Thoughts -->
+        <section id="wishes" class="page-section flex-col items-center justify-center min-h-[80vh]">
+            <div class="glass-card rounded-3xl p-8 md:p-12 w-full text-center relative overflow-hidden">
+                <div class="absolute -top-10 -left-10 w-40 h-40 bg-brand-pink rounded-full opacity-20 blur-2xl"></div>
+                <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-brand-yellow rounded-full opacity-30 blur-2xl"></div>
+
+                <div class="flex justify-between items-center mb-8 relative z-10">
+                    <button onclick="navigateTo('questions')" class="text-gray-400 hover:text-brand-purple transition"><i class="fa-solid fa-arrow-left text-xl"></i></button>
+                    <h2 class="font-cursive text-4xl md:text-5xl text-brand-pink flex-grow">Sweet Thoughts</h2>
+                    <div class="w-6"></div>
+                </div>
+
+                <div class="relative z-10 mb-10">
+                    <i class="fa-solid fa-quote-left text-4xl text-gray-300 mb-4 block"></i>
+                    <p class="text-xl md:text-2xl text-gray-700 font-light leading-relaxed max-w-2xl mx-auto">
+                        "Vaishu, you bring so much joy to everyone around you. May this coming year be filled with beautiful moments, big successes, and endless happiness. Never stop shining your bright light!"
+                    </p>
+                    <i class="fa-solid fa-quote-right text-4xl text-gray-300 mt-4 block text-right max-w-2xl mx-auto"></i>
+                </div>
+
+                <button onclick="openModal()" class="relative inline-flex group z-10">
+                    <div class="absolute transition-all duration-1000 opacity-70 -inset-px bg-gradient-to-r from-[#ffb3c6] via-[#c8b6ff] to-[#ffb3c6] rounded-full blur-lg group-hover:opacity-100 group-hover:-inset-1"></div>
+                    <span class="relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-brand-dark rounded-full shadow-md">
+                        Click for a Secret Surprise! 🎁
+                    </span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- SURPRISE MODAL -->
+    <div id="special-message-modal" class="fixed inset-0 z-[100] items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl p-8 md:p-12 max-w-md w-full shadow-2xl transform scale-95 transition-transform duration-300 relative text-center">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-6xl mb-4 sticker inline-block animate-bounce">🎉</div>
+            <h3 class="font-cursive text-4xl text-brand-purple mb-4">Happy Birthday!</h3>
+            <p class="text-gray-600 mb-6 leading-relaxed">
+                You are truly one of a kind. I hope today is everything you dreamed of and more! Have the best birthday ever, Vaishu! 💖
+            </p>
+            <button onclick="closeModal(); triggerBigConfetti();" class="bg-brand-yellow hover:bg-yellow-300 text-brand-dark font-bold py-2 px-6 rounded-full shadow transition">
+                Yay! 🎂
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase functions
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        const db = window.db;
+        
+        // Submit message to Firebase
+        window.submitMessage = async function() {
+            const thoughts = document.getElementById('thoughts-input').value.trim();
+            const wish = document.getElementById('wish-input').value.trim();
+            const name = document.getElementById('name-input').value.trim() || "Anonymous";
+
+                              
